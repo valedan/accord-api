@@ -2,11 +2,13 @@ interface Task {
   output: string;
 }
 
-interface Workflow {
-  entry_point: string;
-  tasks: {
-    [key: string]: Task;
-  };
+interface TaskCollection {
+  [key: string]: Task;
 }
 
-export { Task, Workflow };
+interface Workflow {
+  entry_point: string;
+  tasks: TaskCollection;
+}
+
+export { Task, TaskCollection, Workflow };
