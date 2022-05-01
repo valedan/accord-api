@@ -1,10 +1,22 @@
-import { Task, TaskCollection, Workflow, WorkflowParams } from "../types";
+import { Step, Task, TaskCollection, Workflow, WorkflowParams } from "../types";
 
 const matchers = {
   // Captures all substrings enclosed by ${}
   subtasks: /\$\{([^}]+)\}/g,
   // Captures all substrings enclosed by @{}
   params: /@\{([^}]+)\}/g,
+};
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const runSteps = async (output: string, steps: Step[]) => {
+  for (const step of steps) {
+    // Currently the only supported step is `wait`, but there could be others in future
+    if (step.wait) {
+      await sleep(step.wait * 1000);
+    }
+  }
+  return output;
 };
 
 // Subtasks are handled recursively by calling runTaskFromList again
@@ -40,7 +52,8 @@ const interpolateParams = async (output: string, params: WorkflowParams) => {
 };
 
 const runTask = async (task: Task, otherTasks: TaskCollection, params: WorkflowParams) => {
-  const outputWithSubtasks = await interpolateSubtasks(task.output, otherTasks, params);
+  const outputAfterSteps = task.steps ? await runSteps(task.output, task.steps) : task.output;
+  const outputWithSubtasks = await interpolateSubtasks(outputAfterSteps, otherTasks, params);
   const outputWithParams = await interpolateParams(outputWithSubtasks, params);
   return outputWithParams;
 };

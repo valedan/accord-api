@@ -1,5 +1,9 @@
+interface Step {
+  wait: number;
+}
 interface Task {
   output: string;
+  steps?: Step[];
 }
 
 interface TaskCollection {
@@ -15,4 +19,4 @@ interface Workflow {
   tasks: TaskCollection;
 }
 
-export { Task, TaskCollection, Workflow, WorkflowParams };
+export { Step, Task, TaskCollection, Workflow, WorkflowParams };

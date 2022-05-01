@@ -1,5 +1,7 @@
 import runWorkflow from "./runWorkflow";
 
+jest.useFakeTimers();
+
 describe("runWorkflow", () => {
   describe("simple workflows", () => {
     it("runs a simple workflow and returns the output", async () => {
@@ -168,6 +170,31 @@ describe("runWorkflow", () => {
       };
 
       await expect(runWorkflow(workflow)).rejects.toThrow();
+    });
+  });
+
+  // TODO: Fix this test - timers not working properly
+  describe("workflows with steps", () => {
+    it.skip("runs a workflow with a step and returns the output", async () => {
+      const workflow = {
+        entry_point: "slow_goodbye",
+        tasks: {
+          slow_goodbye: {
+            steps: [
+              {
+                wait: 5,
+              },
+            ],
+            output: "goodbye!",
+          },
+        },
+      };
+
+      const output = await runWorkflow(workflow);
+
+      jest.advanceTimersByTime(5000);
+
+      expect(output).toBe("goodbye!");
     });
   });
 });
