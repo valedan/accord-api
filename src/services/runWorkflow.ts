@@ -1,16 +1,18 @@
-import { Task, TaskCollection, Workflow } from "../types";
+import { Task, TaskCollection, Workflow, WorkflowParams } from "../types";
 
 const matchers = {
   // Captures all substrings enclosed by ${}
   subtasks: /\$\{([^}]+)\}/g,
+  // Captures all substrings enclosed by @{}
+  params: /@\{([^}]+)\}/g,
 };
 
 // Subtasks are handled recursively by calling runTaskFromList again
-const interpolateSubtasks = async (output: string, subtasks: TaskCollection) => {
+const interpolateSubtasks = async (output: string, subtasks: TaskCollection, params: WorkflowParams) => {
   // For each match, the first element is the full match (eg ${name}), the second is the captured group (eg name)
   const subtaskMatches = Array.from(output.matchAll(matchers.subtasks));
 
-  const subtaskOutputs = await Promise.all(subtaskMatches.map((match) => runTaskFromList(match[1], subtasks)));
+  const subtaskOutputs = await Promise.all(subtaskMatches.map((match) => runTaskFromList(match[1], subtasks, params)));
 
   let newOutput = output;
 
@@ -21,13 +23,29 @@ const interpolateSubtasks = async (output: string, subtasks: TaskCollection) => 
   return newOutput;
 };
 
-const runTask = async (task: Task, otherTasks: TaskCollection) => {
-  const outputWithSubtasks = await interpolateSubtasks(task.output, otherTasks);
+const interpolateParams = async (output: string, params: WorkflowParams) => {
+  const paramMatches = Array.from(output.matchAll(matchers.params));
 
-  return outputWithSubtasks;
+  let newOutput = output;
+
+  paramMatches.forEach((match) => {
+    const paramValue = params[match[1]];
+    if (!paramValue) {
+      throw new Error(`Could not find param ${match[1]}`);
+    }
+    newOutput = newOutput.replace(match[0], paramValue);
+  });
+
+  return newOutput;
 };
 
-const runTaskFromList = async (taskName: string, tasks: TaskCollection) => {
+const runTask = async (task: Task, otherTasks: TaskCollection, params: WorkflowParams) => {
+  const outputWithSubtasks = await interpolateSubtasks(task.output, otherTasks, params);
+  const outputWithParams = await interpolateParams(outputWithSubtasks, params);
+  return outputWithParams;
+};
+
+const runTaskFromList = async (taskName: string, tasks: TaskCollection, params: WorkflowParams) => {
   const task = tasks[taskName];
 
   if (!task) {
@@ -37,11 +55,11 @@ const runTaskFromList = async (taskName: string, tasks: TaskCollection) => {
   // It's important to filter out the current task to prevent infinite recursion
   const otherTasks = Object.fromEntries(Object.entries(tasks).filter(([name]) => name !== taskName));
 
-  return runTask(task, otherTasks);
+  return runTask(task, otherTasks, params);
 };
 
-const runWorkflow = async (workflow: Workflow) => {
-  const output = await runTaskFromList(workflow.entry_point, workflow.tasks);
+const runWorkflow = async (workflow: Workflow, params: WorkflowParams = {}) => {
+  const output = await runTaskFromList(workflow.entry_point, workflow.tasks, params);
 
   return output;
 };

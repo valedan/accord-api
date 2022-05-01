@@ -125,4 +125,49 @@ describe("runWorkflow", () => {
       await expect(runWorkflow(workflow)).rejects.toThrow();
     });
   });
+
+  describe("workflows with parameters", () => {
+    it("runs a workflow with a parameter and returns the output", async () => {
+      const workflow = {
+        entry_point: "hello_input",
+        tasks: {
+          hello_input: {
+            output: "hello @{name}!",
+          },
+        },
+      };
+
+      const output = await runWorkflow(workflow, { name: "Alonzo" });
+
+      expect(output).toBe("hello Alonzo!");
+    });
+
+    it("runs a workflow with multiple parameters and returns the output", async () => {
+      const workflow = {
+        entry_point: "hello_input",
+        tasks: {
+          hello_input: {
+            output: "hello @{name} and @{other_name}!",
+          },
+        },
+      };
+
+      const output = await runWorkflow(workflow, { name: "Alan", other_name: "Bob" });
+
+      expect(output).toBe("hello Alan and Bob!");
+    });
+
+    it("throws an error if parameter name it not found", async () => {
+      const workflow = {
+        entry_point: "hello_input",
+        tasks: {
+          hello_input: {
+            output: "hello @{name}!",
+          },
+        },
+      };
+
+      await expect(runWorkflow(workflow)).rejects.toThrow();
+    });
+  });
 });
