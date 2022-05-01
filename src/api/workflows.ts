@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 
 import { runWorkflow } from "../services/";
-import { Workflow } from "../types";
+import { Workflow, WorkflowParams } from "../types";
 
 const workflowSchema = {
   type: "object",
@@ -28,17 +28,27 @@ const workflowSchema = {
         },
       },
     },
+    parameters: {
+      type: "object",
+      additionalProperties: {
+        type: "string",
+      },
+    },
   },
 };
 
 const workflowRoutes = async (app: FastifyInstance) => {
-  app.post<{ Body: { workflow: Workflow } }>("/workflows", { schema: { body: workflowSchema } }, async (request) => {
-    const { workflow } = request.body;
+  app.post<{ Body: { workflow: Workflow; parameters: WorkflowParams } }>(
+    "/workflows",
+    { schema: { body: workflowSchema } },
+    async (request) => {
+      const { workflow, parameters } = request.body;
 
-    const output = await runWorkflow(workflow);
+      const output = await runWorkflow(workflow, parameters);
 
-    return { output };
-  });
+      return { output };
+    }
+  );
 };
 
 export default workflowRoutes;
