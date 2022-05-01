@@ -1,15 +1,39 @@
 import build from "../app";
 
-describe("ping", () => {
-  it("pongs", async () => {
-    const app = build();
+const app = build();
 
+describe("POST /workflows", () => {
+  it("executes a valid workflow and returns the output", async () => {
     const response = await app.inject({
-      method: "GET",
-      url: "/ping",
+      method: "POST",
+      url: "/workflows",
+      payload: {
+        workflow: {
+          entry_point: "hello_world",
+          tasks: {
+            hello_world: {
+              output: "hello world!",
+            },
+          },
+        },
+      },
     });
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toBe("pong\n");
+    expect(response.json()).toStrictEqual({ output: "hello world!" });
+  });
+
+  it("returns a 400 if the workflow is invalid", async () => {
+    const response = await app.inject({
+      method: "POST",
+      url: "/workflows",
+      payload: {
+        workflow: {
+          entry_point: "missing",
+        },
+      },
+    });
+
+    expect(response.statusCode).toBe(400);
   });
 });
