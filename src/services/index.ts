@@ -1,3 +1,3 @@
-import executeWorkflow from "./executeWorkflow";
+import runWorkflow from "./runWorkflow";
 
-export { executeWorkflow };
+export { runWorkflow };

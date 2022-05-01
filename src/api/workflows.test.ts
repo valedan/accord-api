@@ -3,7 +3,7 @@ import build from "../app";
 const app = build();
 
 describe("POST /workflows", () => {
-  it("executes a valid workflow and returns the output", async () => {
+  it("runs a valid workflow and returns the output", async () => {
     const response = await app.inject({
       method: "POST",
       url: "/workflows",

@@ -1,7 +1,7 @@
-import executeWorkflow from "./executeWorkflow";
+import runWorkflow from "./runWorkflow";
 
-describe("executeWorkflow", () => {
-  it("executes a simple workflow and returns the output", async () => {
+describe("runWorkflow", () => {
+  it("runs a simple workflow and returns the output", async () => {
     const workflow = {
       entry_point: "hello_world",
       tasks: {
@@ -11,7 +11,7 @@ describe("executeWorkflow", () => {
       },
     };
 
-    const output = await executeWorkflow(workflow);
+    const output = await runWorkflow(workflow);
 
     expect(output).toBe("hello world!");
   });
@@ -26,6 +26,6 @@ describe("executeWorkflow", () => {
       },
     };
 
-    await expect(executeWorkflow(workflow)).rejects.toThrow();
+    await expect(runWorkflow(workflow)).rejects.toThrow();
   });
 });

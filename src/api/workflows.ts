@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 
-import { executeWorkflow } from "../services/";
+import { runWorkflow } from "../services/";
 import { Workflow } from "../types";
 
 const workflowSchema = {
@@ -35,7 +35,7 @@ const workflowRoutes = async (app: FastifyInstance) => {
   app.post<{ Body: { workflow: Workflow } }>("/workflows", { schema: { body: workflowSchema } }, async (request) => {
     const { workflow } = request.body;
 
-    const output = await executeWorkflow(workflow);
+    const output = await runWorkflow(workflow);
 
     return { output };
   });

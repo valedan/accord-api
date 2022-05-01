@@ -1,19 +1,19 @@
 import { Task, Workflow } from "../types";
 
-const executeTask = async (task: Task) => {
+const runTask = async (task: Task) => {
   return task.output;
 };
 
-const executeWorkflow = async (workflow: Workflow) => {
+const runWorkflow = async (workflow: Workflow) => {
   const entryPointTask = workflow.tasks[workflow.entry_point];
 
   if (!entryPointTask) {
     throw new Error("Could not find entry point task");
   }
 
-  const output = await executeTask(entryPointTask);
+  const output = await runTask(entryPointTask);
 
   return output;
 };
 
-export default executeWorkflow;
+export default runWorkflow;
