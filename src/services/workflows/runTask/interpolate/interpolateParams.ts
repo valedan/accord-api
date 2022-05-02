@@ -1,4 +1,4 @@
-import { WorkflowParams } from "../types";
+import { WorkflowParams } from "../../types";
 
 const interpolateParams = (output: string, params: WorkflowParams) => {
   // Captures all substrings enclosed by @{}

@@ -7,7 +7,7 @@ interface LengthStep {
 }
 
 interface GreaterThanStep {
-  gt: [string, number];
+  gt: [string, number | string];
 }
 
 interface IfStep {

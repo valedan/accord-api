@@ -1,20 +1,20 @@
-import { WorkflowParams } from "../../../types";
-import interpolateParams from "../../interpolateParams";
-
 interface Condition {
   condition: string;
   true: string;
   false: string;
 }
 
-const ifCondition = (
+const ifCondition = async (
   { condition, true: ifTrue, false: ifFalse }: Condition,
-  params: WorkflowParams
+  interpolate: (value: string) => Promise<string>
 ) => {
-  const interpolatedInput = interpolateParams(condition, params);
+  const interpolatedInput = await interpolate(condition);
+  const interpolatedIfTrue = await interpolate(ifTrue);
+  const interpolatedIfFalse = await interpolate(ifFalse);
 
-  // TODO: Add interpolation for ifTrue and ifFalse
-  return interpolatedInput === "true" ? ifTrue : ifFalse;
+  return interpolatedInput === "true"
+    ? interpolatedIfTrue
+    : interpolatedIfFalse;
 };
 
 export default ifCondition;

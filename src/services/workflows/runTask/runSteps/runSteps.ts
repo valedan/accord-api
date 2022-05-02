@@ -1,7 +1,8 @@
 import {
-  isGreaterThanStep, isIfStep, isLengthStep, isWaitStep, Step, TaskResult,
-  WorkflowParams
+  isGreaterThanStep, isIfStep, isLengthStep, isWaitStep, Step, TaskCollection,
+  TaskResult, WorkflowParams
 } from "../../types";
+import { interpolateTaskString } from "../interpolate";
 import { greaterThan, ifCondition, length, wait } from "./steps";
 
 // Eventually we may need to handle steps that output arrays or objects, but for now all of our steps are simple.
@@ -14,34 +15,51 @@ const paramsForStep = (
   return {
     ...workflowParams,
     // TODO: Add validation to prevent user inputting 0 (or numbers generally) as param names
-    // Converting to string is unfortunate here and adds complexity to some steps such as greaterThan and if.
-    // But it lets us treat interpolation in a consistent way for all task inputs
-    // Worth thinking about this more - there is probably a better way
     "0": previousStepOutput.toString(),
   };
 };
 
+// Run each step in sequence. The output of each step may be used as input to the next.
 const runSteps = async (
   steps: Step[] = [],
+  otherTasks: TaskCollection,
   params: WorkflowParams,
   taskName: string,
   handleResult?: (result: TaskResult) => void
 ) => {
-  // Run each step in sequence. The output of each step may be used as input to the next.
-
   let previousStepOutput: StepOutput = "";
 
   for (const [index, step] of steps.entries()) {
     const stepParams = paramsForStep(params, previousStepOutput);
 
+    // Each step function will use this to parse its inputs
+    // We could make this more generic by applying it to all entries in the step object before calling the functions (recursively to handle nested objects), then step functions would not need to know about interpolation at all.
+    const interpolateWithStepContext = async (input: string | number) => {
+      return await interpolateTaskString(
+        input.toString(),
+        otherTasks,
+        stepParams,
+        handleResult
+      );
+    };
+
     if (isWaitStep(step)) {
-      await wait(step.wait); // Wait does not modify the previous output
+      await wait(step.wait);
     } else if (isLengthStep(step)) {
-      previousStepOutput = length(step.length, stepParams);
+      previousStepOutput = await length(
+        step.length,
+        interpolateWithStepContext
+      );
     } else if (isGreaterThanStep(step)) {
-      previousStepOutput = greaterThan(step.gt, stepParams);
+      previousStepOutput = await greaterThan(
+        step.gt,
+        interpolateWithStepContext
+      );
     } else if (isIfStep(step)) {
-      previousStepOutput = ifCondition(step.if, stepParams);
+      previousStepOutput = await ifCondition(
+        step.if,
+        interpolateWithStepContext
+      );
     } else {
       throw new Error(`Unknown step type: ${JSON.stringify(step)}`);
     }

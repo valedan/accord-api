@@ -1,6 +1,5 @@
 import { TaskCollection, TaskResult, WorkflowParams } from "../types";
-import interpolateParams from "./interpolateParams";
-import interpolateSubtasks from "./interpolateSubtasks";
+import { interpolateTaskString } from "./interpolate";
 import runSteps from "./runSteps/runSteps";
 
 const runTask = async (
@@ -20,12 +19,20 @@ const runTask = async (
     Object.entries(tasks).filter(([name]) => name !== taskName)
   );
 
-  const stepOutput = await runSteps(task.steps, params, taskName, handleResult);
+  const stepOutput = await runSteps(
+    task.steps,
+    otherTasks,
+    params,
+    taskName,
+    handleResult
+  );
 
-  let output = task.output || stepOutput;
-
-  output = await interpolateSubtasks(output, otherTasks, params, handleResult);
-  output = interpolateParams(output, params);
+  const output = await interpolateTaskString(
+    task.output || stepOutput, // If the task has no output, use the output of the last step
+    otherTasks,
+    params,
+    handleResult
+  );
 
   if (handleResult) {
     handleResult({ task: taskName, step: "output", result: output });

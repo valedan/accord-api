@@ -1,9 +1,8 @@
-import { WorkflowParams } from "../../../types";
-import interpolateParams from "../../interpolateParams";
-
-const length = (input: string, params: WorkflowParams) => {
-  const interpolatedInput = interpolateParams(input, params);
-
+const length = async (
+  input: string,
+  interpolate: (value: string) => Promise<string>
+) => {
+  const interpolatedInput = await interpolate(input);
   return interpolatedInput.length;
 };
 

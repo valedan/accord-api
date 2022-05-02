@@ -1,5 +1,5 @@
-import { TaskCollection, TaskResult, WorkflowParams } from "../types";
-import runTask from "./runTask";
+import { TaskCollection, TaskResult, WorkflowParams } from "../../types";
+import runTask from "../runTask";
 
 // Subtasks are handled recursively by calling runTask again
 const interpolateSubtasks = async (

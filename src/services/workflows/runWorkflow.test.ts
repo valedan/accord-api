@@ -233,5 +233,50 @@ describe("runWorkflow", () => {
       expect(shortOutput).toBe("Harold is a short name");
       expect(longOutput).toBe("Margaret is a long name");
     });
+
+    it("interpolates subtasks and parameters in steps", async () => {
+      const workflow = {
+        entry_point: "custom_name_classifier",
+        tasks: {
+          is_name_greater_than_threshold: {
+            steps: [
+              {
+                length: "@{name}",
+              },
+              {
+                gt: ["@{0}", "@{threshold}"] as [string, string],
+              },
+            ],
+          },
+          name_is_long_or_short: {
+            steps: [
+              {
+                if: {
+                  condition: "${is_name_greater_than_threshold}",
+                  true: "longer than @{threshold}",
+                  false: "shorter than @{threshold}",
+                },
+              },
+            ],
+          },
+          custom_name_classifier: {
+            output: "@{name} is ${name_is_long_or_short}",
+          },
+        },
+      };
+
+      const shortOutput = await runWorkflow(workflow, {
+        name: "Harold",
+        threshold: "7",
+      });
+
+      const longOutput = await runWorkflow(workflow, {
+        name: "Margaret",
+        threshold: "7",
+      });
+
+      expect(shortOutput).toBe("Harold is shorter than 7");
+      expect(longOutput).toBe("Margaret is longer than 7");
+    });
   });
 });
