@@ -7,7 +7,10 @@ interface Condition {
   false: string;
 }
 
-const ifCondition = ({ condition, true: ifTrue, false: ifFalse }: Condition, params: WorkflowParams) => {
+const ifCondition = (
+  { condition, true: ifTrue, false: ifFalse }: Condition,
+  params: WorkflowParams
+) => {
   const interpolatedInput = interpolateParams(condition, params);
 
   // TODO: Add interpolation for ifTrue and ifFalse

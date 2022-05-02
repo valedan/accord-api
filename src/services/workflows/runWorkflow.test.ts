@@ -154,7 +154,10 @@ describe("runWorkflow", () => {
         },
       };
 
-      const output = await runWorkflow(workflow, { name: "Alan", other_name: "Bob" });
+      const output = await runWorkflow(workflow, {
+        name: "Alan",
+        other_name: "Bob",
+      });
 
       expect(output).toBe("hello Alan and Bob!");
     });

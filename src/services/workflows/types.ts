@@ -29,6 +29,12 @@ interface TaskCollection {
   [key: string]: Task;
 }
 
+interface TaskResult {
+  task: string;
+  step: number | "output";
+  result: string | number | boolean;
+}
+
 interface WorkflowParams {
   [key: string]: string;
 }
@@ -54,4 +60,15 @@ function isIfStep(step: Step): step is IfStep {
   return Object.prototype.hasOwnProperty.call(step, "if");
 }
 
-export { Step, Task, TaskCollection, Workflow, WorkflowParams, isWaitStep, isLengthStep, isGreaterThanStep, isIfStep };
+export {
+  Step,
+  Task,
+  TaskCollection,
+  TaskResult,
+  Workflow,
+  WorkflowParams,
+  isWaitStep,
+  isLengthStep,
+  isGreaterThanStep,
+  isIfStep,
+};

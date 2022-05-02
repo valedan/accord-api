@@ -34,7 +34,7 @@ describe("POST /workflows", () => {
     });
 
     expect(response.statusCode).toBe(200);
-    expect(response.json()).toStrictEqual({ output: "hello world!" });
+    expect(response.json().output).toStrictEqual("hello world!");
   });
 
   it("runs a workflow with parameters and returns the output", async () => {
@@ -57,6 +57,6 @@ describe("POST /workflows", () => {
     });
 
     expect(response.statusCode).toBe(200);
-    expect(response.json()).toStrictEqual({ output: "hello Alonzo!" });
+    expect(response.json().output).toStrictEqual("hello Alonzo!");
   });
 });

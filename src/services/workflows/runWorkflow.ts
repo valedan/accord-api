@@ -1,8 +1,17 @@
 import runTask from "./runTask/runTask";
-import { Workflow, WorkflowParams } from "./types";
+import { TaskResult, Workflow, WorkflowParams } from "./types";
 
-const runWorkflow = async (workflow: Workflow, params: WorkflowParams = {}) => {
-  const output = await runTask(workflow.entry_point, workflow.tasks, params);
+const runWorkflow = async (
+  workflow: Workflow,
+  params: WorkflowParams = {},
+  handleResult?: (result: TaskResult) => void
+) => {
+  const output = await runTask(
+    workflow.entry_point,
+    workflow.tasks,
+    params,
+    handleResult
+  );
 
   return output;
 };

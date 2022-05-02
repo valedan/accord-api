@@ -1,7 +1,10 @@
 import { WorkflowParams } from "../../../types";
 import interpolateParams from "../../interpolateParams";
 
-const greaterThan = ([input, threshold]: [string, number], params: WorkflowParams) => {
+const greaterThan = (
+  [input, threshold]: [string, number],
+  params: WorkflowParams
+) => {
   const interpolatedInput = interpolateParams(input, params);
 
   const numericInput = Number(interpolatedInput);

@@ -1,7 +1,9 @@
 import { FastifyInstance } from "fastify";
 
 import { runWorkflow } from "../services/";
-import { Workflow, WorkflowParams } from "../services/workflows/types";
+import {
+  TaskResult, Workflow, WorkflowParams
+} from "../services/workflows/types";
 
 const workflowSchema = {
   type: "object",
@@ -51,9 +53,15 @@ const workflowRoutes = async (app: FastifyInstance) => {
     async (request) => {
       const { workflow, parameters } = request.body;
 
-      const output = await runWorkflow(workflow, parameters);
+      const debug: TaskResult[] = [];
 
-      return { output };
+      const handleResult = ({ task, step, result }: TaskResult) => {
+        debug.push({ task, step, result });
+      };
+
+      const output = await runWorkflow(workflow, parameters, handleResult);
+
+      return { output, debug };
     }
   );
 };
