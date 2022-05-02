@@ -20,8 +20,9 @@ const runTask = async (
     Object.entries(tasks).filter(([name]) => name !== taskName)
   );
 
-  let output =
-    task.output || (await runSteps(task.steps, params, taskName, handleResult));
+  const stepOutput = await runSteps(task.steps, params, taskName, handleResult);
+
+  let output = task.output || stepOutput;
 
   output = await interpolateSubtasks(output, otherTasks, params, handleResult);
   output = interpolateParams(output, params);
