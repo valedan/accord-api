@@ -18,7 +18,14 @@ const workflowSchema = {
           type: "object",
           additionalProperties: {
             type: "object",
-            required: ["output"],
+            anyOf: [
+              {
+                required: ["output"],
+              },
+              {
+                required: ["steps"],
+              },
+            ],
             properties: {
               output: {
                 type: "string",
