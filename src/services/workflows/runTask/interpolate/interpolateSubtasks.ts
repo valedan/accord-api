@@ -3,13 +3,13 @@ import runTask from "../runTask";
 
 // Subtasks are handled recursively by calling runTask again
 const interpolateSubtasks = async (
-  output: string,
+  taskString: string,
   subtasks: TaskCollection,
   params: WorkflowParams,
   handleResult?: (result: TaskResult) => void
 ) => {
   // Captures all substrings enclosed by ${}
-  const subtaskMatches = Array.from(output.matchAll(/\$\{([^}]+)\}/g));
+  const subtaskMatches = Array.from(taskString.matchAll(/\$\{([^}]+)\}/g));
 
   const subtaskOutputs = await Promise.all(
     subtaskMatches.map((match) =>
@@ -17,13 +17,13 @@ const interpolateSubtasks = async (
     )
   );
 
-  let newOutput = output;
+  let newTaskString = taskString;
 
   subtaskMatches.forEach((match, index) => {
-    newOutput = newOutput.replace(match[0], subtaskOutputs[index]);
+    newTaskString = newTaskString.replace(match[0], subtaskOutputs[index]);
   });
 
-  return newOutput;
+  return newTaskString;
 };
 
 export default interpolateSubtasks;

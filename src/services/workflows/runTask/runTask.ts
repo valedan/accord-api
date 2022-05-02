@@ -2,6 +2,8 @@ import { TaskCollection, TaskResult, WorkflowParams } from "../types";
 import { interpolateTaskString } from "./interpolate";
 import runSteps from "./runSteps/runSteps";
 
+// TODO: runTask, runSteps, and interpolateTaskString have a lot of overlap in their arguments
+//  Consider combining the overlapping args into an object called `intermediateResults` or something
 const runTask = async (
   taskName: string,
   tasks: TaskCollection,

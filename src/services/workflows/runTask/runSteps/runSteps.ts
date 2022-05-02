@@ -43,6 +43,7 @@ const runSteps = async (
       );
     };
 
+    // TODO: This long conditional is a bit hard to read. Needs to be tidied up somehow.
     if (isWaitStep(step)) {
       await wait(step.wait);
     } else if (isLengthStep(step)) {

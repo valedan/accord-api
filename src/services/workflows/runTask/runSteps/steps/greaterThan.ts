@@ -8,7 +8,7 @@ const greaterThan = async (
   const numericInput = Number(interpolatedInput);
   const numericThreshold = Number(interpolatedThreshold);
 
-  // TODO: This is tricky - need some unit tests here!
+  // TODO: This is tricky - need some unit tests here to check different inputs
   if (!Number.isFinite(numericInput)) {
     throw new Error(`Could not convert input ${interpolatedInput} to a number`);
   }

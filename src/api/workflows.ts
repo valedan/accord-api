@@ -5,6 +5,7 @@ import {
   TaskResult, Workflow, WorkflowParams
 } from "../services/workflows/types";
 
+// TODO: Set up a codegen tool to generate schema based on Typescript types
 const workflowSchema = {
   type: "object",
   required: ["workflow"],
@@ -55,6 +56,7 @@ const workflowRoutes = async (app: FastifyInstance) => {
 
       const debug: TaskResult[] = [];
 
+      // TODO: Implement streaming of debug output
       const handleResult = ({ task, step, result }: TaskResult) => {
         debug.push({ task, step, result });
       };
