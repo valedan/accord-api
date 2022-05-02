@@ -1,3 +1,3 @@
-import runWorkflow from "./runWorkflow";
+import runWorkflow from "./workflows/runWorkflow";
 
 export { runWorkflow };

@@ -196,5 +196,39 @@ describe("runWorkflow", () => {
 
       expect(output).toBe("goodbye!");
     });
+
+    it("runs a workflow with conditions and returns the output", async () => {
+      const workflow = {
+        entry_point: "name_classifier",
+        tasks: {
+          name_is_long_or_short: {
+            steps: [
+              {
+                length: "@{name}",
+              },
+              {
+                gt: ["@{0}", 7] as [string, number],
+              },
+              {
+                if: {
+                  condition: "@{0}",
+                  true: "long name",
+                  false: "short name",
+                },
+              },
+            ],
+          },
+          name_classifier: {
+            output: "@{name} is a ${name_is_long_or_short}",
+          },
+        },
+      };
+
+      const shortOutput = await runWorkflow(workflow, { name: "Harold" });
+      const longOutput = await runWorkflow(workflow, { name: "Margaret" });
+
+      expect(shortOutput).toBe("Harold is a short name");
+      expect(longOutput).toBe("Margaret is a long name");
+    });
   });
 });

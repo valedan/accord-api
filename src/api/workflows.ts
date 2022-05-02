@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 
 import { runWorkflow } from "../services/";
-import { Workflow, WorkflowParams } from "../types";
+import { Workflow, WorkflowParams } from "../services/workflows/types";
 
 const workflowSchema = {
   type: "object",
