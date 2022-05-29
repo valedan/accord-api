@@ -44,6 +44,15 @@ interface Workflow {
   tasks: TaskCollection;
 }
 
+type WorkflowResultHandler = (result: TaskResult) => void;
+
+interface ExecutableWorkflow {
+  entry_point: string;
+  tasks: TaskCollection;
+  params: WorkflowParams;
+  handleResult?: WorkflowResultHandler;
+}
+
 function isWaitStep(step: Step): step is WaitStep {
   return Object.prototype.hasOwnProperty.call(step, "wait");
 }
@@ -67,6 +76,7 @@ export {
   TaskResult,
   Workflow,
   WorkflowParams,
+  ExecutableWorkflow,
   isWaitStep,
   isLengthStep,
   isGreaterThanStep,

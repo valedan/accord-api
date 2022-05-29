@@ -1,43 +1,39 @@
-import { TaskCollection, TaskResult, WorkflowParams } from "../types";
+import { ExecutableWorkflow } from "../types";
 import { interpolateTaskString } from "./interpolate";
 import runSteps from "./runSteps/runSteps";
 
-// TODO: runTask, runSteps, and interpolateTaskString have a lot of overlap in their arguments
-//  Consider combining the overlapping args into an object called `intermediateResults` or something
-const runTask = async (
+const workflowWithoutTask = (
   taskName: string,
-  tasks: TaskCollection,
-  params: WorkflowParams,
-  handleResult?: (result: TaskResult) => void
-) => {
-  const task = tasks[taskName];
+  workflow: ExecutableWorkflow
+) => ({
+  ...workflow,
+  tasks: Object.fromEntries(
+    Object.entries(workflow.tasks).filter(([name]) => name !== taskName)
+  ),
+});
+
+const runTask = async (taskName: string, workflow: ExecutableWorkflow) => {
+  const task = workflow.tasks[taskName];
 
   if (!task) {
     throw new Error(`Could not find task ${taskName}`);
   }
 
-  // It's important to filter out the current task to prevent infinite recursion
-  const otherTasks = Object.fromEntries(
-    Object.entries(tasks).filter(([name]) => name !== taskName)
-  );
-
-  const stepOutput = await runSteps(
-    task.steps,
-    otherTasks,
-    params,
-    taskName,
-    handleResult
-  );
+  const stepOutput = await runSteps(taskName, workflow);
 
   const output = await interpolateTaskString(
-    task.output || stepOutput, // If the task has no output, use the output of the last step
-    otherTasks,
-    params,
-    handleResult
+    // If the task has no output, use the output of the last step
+    task.output || stepOutput,
+    // It's important to filter out the current task to prevent infinite recursion
+    workflowWithoutTask(taskName, workflow)
   );
 
-  if (handleResult) {
-    handleResult({ task: taskName, step: "output", result: output });
+  if (workflow.handleResult) {
+    workflow.handleResult({
+      task: taskName,
+      step: "output",
+      result: output,
+    });
   }
 
   return output;

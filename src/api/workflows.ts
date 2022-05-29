@@ -61,7 +61,11 @@ const workflowRoutes = async (app: FastifyInstance) => {
         debug.push({ task, step, result });
       };
 
-      const output = await runWorkflow(workflow, parameters, handleResult);
+      const output = await runWorkflow({
+        ...workflow,
+        params: parameters,
+        handleResult,
+      });
 
       return { output, debug };
     }

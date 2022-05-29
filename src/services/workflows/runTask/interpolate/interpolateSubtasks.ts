@@ -1,20 +1,16 @@
-import { TaskCollection, TaskResult, WorkflowParams } from "../../types";
+import { ExecutableWorkflow } from "../../types";
 import runTask from "../runTask";
 
 // Subtasks are handled recursively by calling runTask again
 const interpolateSubtasks = async (
   taskString: string,
-  subtasks: TaskCollection,
-  params: WorkflowParams,
-  handleResult?: (result: TaskResult) => void
+  workflow: ExecutableWorkflow
 ) => {
   // Captures all substrings enclosed by ${}
   const subtaskMatches = Array.from(taskString.matchAll(/\$\{([^}]+)\}/g));
 
   const subtaskOutputs = await Promise.all(
-    subtaskMatches.map((match) =>
-      runTask(match[1], subtasks, params, handleResult)
-    )
+    subtaskMatches.map((match) => runTask(match[1], workflow))
   );
 
   let newTaskString = taskString;

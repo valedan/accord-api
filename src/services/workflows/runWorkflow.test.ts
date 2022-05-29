@@ -12,6 +12,7 @@ describe("runWorkflow", () => {
             output: "hello world!",
           },
         },
+        params: {},
       };
 
       const output = await runWorkflow(workflow);
@@ -27,6 +28,7 @@ describe("runWorkflow", () => {
             output: "hello world!",
           },
         },
+        params: {},
       };
 
       await expect(runWorkflow(workflow)).rejects.toThrow();
@@ -45,6 +47,7 @@ describe("runWorkflow", () => {
             output: "hello ${name}!",
           },
         },
+        params: {},
       };
 
       const output = await runWorkflow(workflow);
@@ -66,6 +69,7 @@ describe("runWorkflow", () => {
             output: "hello ${name} and ${other_name}!",
           },
         },
+        params: {},
       };
 
       const output = await runWorkflow(workflow);
@@ -90,6 +94,7 @@ describe("runWorkflow", () => {
             output: "hello ${name}, my name is ${my_name}!",
           },
         },
+        params: {},
       };
 
       const output = await runWorkflow(workflow);
@@ -105,6 +110,7 @@ describe("runWorkflow", () => {
             output: "hello ${name}!",
           },
         },
+        params: {},
       };
 
       await expect(runWorkflow(workflow)).rejects.toThrow();
@@ -122,6 +128,7 @@ describe("runWorkflow", () => {
             output: "hello ${name}!",
           },
         },
+        params: {},
       };
 
       await expect(runWorkflow(workflow)).rejects.toThrow();
@@ -137,9 +144,10 @@ describe("runWorkflow", () => {
             output: "hello @{name}!",
           },
         },
+        params: { name: "Alonzo" },
       };
 
-      const output = await runWorkflow(workflow, { name: "Alonzo" });
+      const output = await runWorkflow(workflow);
 
       expect(output).toBe("hello Alonzo!");
     });
@@ -152,12 +160,13 @@ describe("runWorkflow", () => {
             output: "hello @{name} and @{other_name}!",
           },
         },
+        params: {
+          name: "Alan",
+          other_name: "Bob",
+        },
       };
 
-      const output = await runWorkflow(workflow, {
-        name: "Alan",
-        other_name: "Bob",
-      });
+      const output = await runWorkflow(workflow);
 
       expect(output).toBe("hello Alan and Bob!");
     });
@@ -170,6 +179,7 @@ describe("runWorkflow", () => {
             output: "hello @{name}!",
           },
         },
+        params: {},
       };
 
       await expect(runWorkflow(workflow)).rejects.toThrow();
@@ -191,6 +201,7 @@ describe("runWorkflow", () => {
             output: "goodbye!",
           },
         },
+        params: {},
       };
 
       const output = await runWorkflow(workflow);
@@ -227,8 +238,15 @@ describe("runWorkflow", () => {
         },
       };
 
-      const shortOutput = await runWorkflow(workflow, { name: "Harold" });
-      const longOutput = await runWorkflow(workflow, { name: "Margaret" });
+      const shortOutput = await runWorkflow({
+        ...workflow,
+        params: { name: "Harold" },
+      });
+
+      const longOutput = await runWorkflow({
+        ...workflow,
+        params: { name: "Margaret" },
+      });
 
       expect(shortOutput).toBe("Harold is a short name");
       expect(longOutput).toBe("Margaret is a long name");
@@ -265,14 +283,20 @@ describe("runWorkflow", () => {
         },
       };
 
-      const shortOutput = await runWorkflow(workflow, {
-        name: "Harold",
-        threshold: "7",
+      const shortOutput = await runWorkflow({
+        ...workflow,
+        params: {
+          name: "Harold",
+          threshold: "7",
+        },
       });
 
-      const longOutput = await runWorkflow(workflow, {
-        name: "Margaret",
-        threshold: "7",
+      const longOutput = await runWorkflow({
+        ...workflow,
+        params: {
+          name: "Margaret",
+          threshold: "7",
+        },
       });
 
       expect(shortOutput).toBe("Harold is shorter than 7");
